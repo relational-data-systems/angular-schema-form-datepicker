@@ -28,7 +28,7 @@
     "coverage"
   ],
   "dependencies": {
-    "angular-schema-form": "https://github.com/relational-data-systems/angular-schema-form.git#develop",
+    "angular-schema-form": "https://github.com/relational-data-systems/angular-schema-form.git#development",
     "pickadate": "~3.5.3"
   },
   "devDependencies": {
