@@ -1,4 +1,4 @@
-angular.module("schemaForm").run(["$templateCache", function($templateCache) {$templateCache.put("directives/decorators/bootstrap/datepicker/datepicker.html","<div class=\"form-group {{form.htmlClass}}\" ng-class=\"{\'has-error\': hasError()}\">\n  <label class=\"control-label {{form.labelHtmlClass}}\" ng-show=\"showTitle()\">{{form.title}}</label>\n  <div ng-class=\"{\'input-group\': (form.fieldAddonLeft || form.fieldAddonRight)}\">\n    <span ng-if=\"form.fieldAddonLeft\"\n          class=\"input-group-addon\"\n          ng-bind-html=\"form.fieldAddonLeft\"></span>\n    <input ng-show=\"form.key\"\n           type=\"text\"\n           class=\"form-control {{form.fieldHtmlClass}}\"\n           schema-validate=\"form\"\n           ng-model=\"$$value$$\"\n           ng-disabled=\"form.readonly\"\n           pick-a-date=\"form.pickadate\"\n           min-date=\"form.minDate\"\n           max-date=\"form.maxDate\"\n           select-years=\"form.selectYears\"\n           select-months=\"form.selectMonths\"\n           name=\"{{form.key.slice(-1)[0]}}\"\n           format=\"form.format\" />\n    <span ng-if=\"form.fieldAddonRight\"\n          class=\"input-group-addon\"\n          ng-bind-html=\"form.fieldAddonRight\"></span>\n  </div>\n  <span class=\"help-block\">{{ (hasError() && errorMessage(schemaError())) || form.description}}</span>\n</div>\n");}]);
+angular.module("schemaForm").run(["$templateCache", function($templateCache) {$templateCache.put("directives/decorators/bootstrap/datepicker/datepicker.html","<div class=\"form-group {{form.htmlClass}}\" ng-class=\"{\'has-error\': hasError()}\">\r\n  <label class=\"control-label\" ng-show=\"showTitle()\">{{form.title}}</label>\r\n  <div ng-class=\"{\'input-group\': (form.fieldAddonLeft || form.fieldAddonRight)}\">\r\n    <span ng-if=\"form.fieldAddonLeft\"\r\n          class=\"input-group-addon\"\r\n          ng-bind-html=\"form.fieldAddonLeft\"></span>\r\n    <input ng-show=\"form.key\"\r\n           style=\"background-color: white; cursor: default;\"\r\n           type=\"text\"\r\n           class=\"form-control {{form.fieldHtmlClass}}\"\r\n           schema-validate=\"form\"\r\n           sf-field-model=\"\"\r\n           ng-disabled=\"form.readonly\"\r\n           pick-a-date=\"form.pickadate\"\r\n           min-date=\"form.minDate\"\r\n           max-date=\"form.maxDate\"\r\n           name=\"{{form.key.slice(-1)[0]}}\"\r\n           format=\"form.format\" />\r\n    <span ng-if=\"form.fieldAddonRight\"\r\n          class=\"input-group-addon\"\r\n          ng-bind-html=\"form.fieldAddonRight\"></span>\r\n  </div>\r\n  <span class=\"help-block\">{{ (hasError() && errorMessage(schemaError())) || form.description}}</span>\r\n</div>\r\n");}]);
 angular.module('schemaForm').directive('pickADate', function() {
 
   //String dates for min and max is not supported
@@ -97,30 +97,33 @@ angular.module('schemaForm').directive('pickADate', function() {
 });
 
 angular.module('schemaForm').config(
-['schemaFormProvider', 'schemaFormDecoratorsProvider', 'sfPathProvider',
-  function(schemaFormProvider,  schemaFormDecoratorsProvider, sfPathProvider) {
+    ['schemaFormProvider', 'schemaFormDecoratorsProvider', 'sfPathProvider', 'sfBuilderProvider',
+      function(schemaFormProvider, schemaFormDecoratorsProvider, sfPathProvider, sfBuilderProvider) {
 
-    var datepicker = function(name, schema, options) {
-      if (schema.type === 'string' && (schema.format === 'date' || schema.format === 'date-time')) {
-        var f = schemaFormProvider.stdFormObj(name, schema, options);
-        f.key  = options.path;
-        f.type = 'datepicker';
-        options.lookup[sfPathProvider.stringify(options.path)] = f;
-        return f;
+        var datepicker = function(name, schema, options) {
+          if (schema.type === 'string' && (schema.format === 'date' || schema.format === 'date-time')) {
+            var f = schemaFormProvider.stdFormObj(name, schema, options);
+            f.key = options.path;
+            f.type = 'datepicker';
+            options.lookup[sfPathProvider.stringify(options.path)] = f;
+            return f;
+          }
+        };
+
+        schemaFormProvider.defaults.string.unshift(datepicker);
+
+        var ngModelOptions = sfBuilderProvider.builders.ngModelOptions;
+        var ngModel = sfBuilderProvider.builders.ngModel;
+        var sfField = sfBuilderProvider.builders.sfField;
+        var condition = sfBuilderProvider.builders.condition;
+        var defaults = [sfField, ngModel, ngModelOptions, condition];
+
+        //Add to the bootstrap directive
+        schemaFormDecoratorsProvider.defineAddOn(
+            'bootstrapDecorator',
+            'datepicker',
+            'directives/decorators/bootstrap/datepicker/datepicker.html',
+            defaults
+        );
       }
-    };
-
-    schemaFormProvider.defaults.string.unshift(datepicker);
-
-    //Add to the bootstrap directive
-    schemaFormDecoratorsProvider.addMapping(
-      'bootstrapDecorator',
-      'datepicker',
-      'directives/decorators/bootstrap/datepicker/datepicker.html'
-    );
-    schemaFormDecoratorsProvider.createDirective(
-      'datepicker',
-      'directives/decorators/bootstrap/datepicker/datepicker.html'
-    );
-  }
-]);
+    ]);
