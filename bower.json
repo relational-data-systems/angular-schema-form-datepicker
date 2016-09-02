@@ -29,6 +29,7 @@
   ],
   "dependencies": {
     "angular-schema-form": "https://github.com/relational-data-systems/angular-schema-form.git#development",
+    "angular-schema-form-bootstrap": "https://github.com/relational-data-systems/angular-schema-form-bootstrap.git#develop",
     "pickadate": "~3.5.3"
   },
   "devDependencies": {
